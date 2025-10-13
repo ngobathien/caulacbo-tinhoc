@@ -39,8 +39,20 @@ class AuthController {
 
       // Gửi email xác thực, chưa _id của user đó (nếu cần)
       const verificationToken = this.generateToken(newUser._id);
-      await sendVerificationEmail(newUser.email, verificationToken);
+      // await sendVerificationEmail(newUser.email, verificationToken);
 
+// ===================
+      sendVerificationEmail(newUser.email, verificationToken)
+  .then(() => console.log("✅ Verification email sent"))
+  .catch(err => console.error("❌ Email send error:", err));
+
+res.status(201).json({
+  message: "Đăng ký thành công! (Email xác thực sẽ được gửi sau)",
+  user: { id: newUser._id, username: newUser.username, email: newUser.email },
+});
+
+      // ============
+      
       res.status(201).json({
         message:
           "Đăng ký thành công! Hãy kiểm tra email để xác thực, sau đó chờ admin duyệt tài khoản.",
