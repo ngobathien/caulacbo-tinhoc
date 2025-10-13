@@ -23,3 +23,6 @@ GET http://localhost:4000/api/v1/classes/ <br>
 POST http://localhost:4000/api/v1/classes/ <br>
 PUT http://localhost:4000/api/v1/classes/:id <br>
 DELETE http://localhost:4000/api/v1/posts/:id <br>
+## 🚀 Deployment
+Backend API live at: [https://itclub-api.onrender.com](https://itclub-api.onrender.com)
+
