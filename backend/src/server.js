@@ -33,7 +33,9 @@ connectDB();
 
 // http://localhost:4000/
 // Sử dụng router đã định nghĩa trong routes/index.js
-app.use("/", router);
+const api = process.env.API_URL;
+// console.log(api);
+app.use(`${api}`, router);
 
 // Start server
 app.listen(port, () => {
@@ -44,3 +46,5 @@ app.listen(port, () => {
 // app.listen(port, "0.0.0.0", () => {
 //   console.log(`Example app listening at http://192.168.1.50:${port}`);
 // });
+
+// console.log(process.env.MONGODB_URI);
