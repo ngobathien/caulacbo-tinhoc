@@ -164,7 +164,7 @@ function AssignmentSubmissionsList({ assignmentId }) {
                         </td>
                         <td className="border px-2 py-1">
                           <button
-                            onClick={() => downloadSubmission(s._id)}
+                            onClick={() => downloadSubmission(s.storagePath)}
                             className="text-blue-500 underline"
                           >
                             Tải file

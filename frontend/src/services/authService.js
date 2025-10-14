@@ -1,8 +1,8 @@
 import axios from "axios";
 
 const auth = axios.create({
-  baseURL: import.meta.env.VITE_API_URL, //|| "http://localhost:4000"
-  timeout: 10000,
+  baseURL: import.meta.env.VITE_API_URL,
+  timeout: 100000,
   headers: { "Content-Type": "application/json" },
 });
 

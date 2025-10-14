@@ -30,6 +30,6 @@ router.get(
 router.put("/grade/:id", protect, SubmissionController.gradeSubmission);
 
 // Tải file
-router.get("/download/:id", SubmissionController.downloadSubmission);
+router.get("/download/", SubmissionController.downloadSubmission);
 
 export default router;

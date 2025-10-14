@@ -83,7 +83,7 @@ function SubmitAssignment({
           <b>Đã nộp:</b> {new Date(submission.submittedAt).toLocaleString()}{" "}
           <br />
           <button
-            onClick={() => downloadSubmission(submission._id)}
+            onClick={() => downloadSubmission(submission.storagePath)}
             className="text-blue-500 underline"
           >
             Tải file đã nộp

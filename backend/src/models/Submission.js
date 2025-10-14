@@ -21,7 +21,11 @@ const submissionSchema = new mongoose.Schema(
       ref: "Group",
     },
 
-    fileUrl: { type: String, required: true }, // Đường dẫn file trên server
+    // Đường dẫn file trên database, để mở xem
+    fileUrl: { type: String, required: true },
+
+    // Đường dẫn trong Supabase để tải file
+    storagePath: { type: String, required: true },
     submittedAt: { type: Date, default: Date.now },
     grade: { type: Number, default: null }, // Điểm
     feedback: { type: String, default: "" },

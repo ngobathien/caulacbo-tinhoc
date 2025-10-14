@@ -18,7 +18,7 @@ export const sendVerificationEmail = async (email, token) => {
         <h2 style="color: #0056b3;">Xác nhận tài khoản của bạn</h2>
         <p>Xin chào,</p>
         <p>Cảm ơn bạn đã đăng ký tài khoản. Để hoàn tất quá trình đăng ký, vui lòng xác nhận email bằng cách nhấp vào liên kết dưới đây:</p>
-        <a href="${process.env.BASE_URL}/auth/verify/${token}" 
+        <a href="${process.env.BASE_URL}/api/v1/auth/verify/${token}" 
           style="display: inline-block; padding: 10px 20px; color: #fff; background-color: #007bff; text-decoration: none; border-radius: 5px; margin-top: 10px;">
           Xác thực tài khoản
         </a>

@@ -31,8 +31,10 @@ router.use("/counts", countRoutes);
 // http://localhost:4000/api/v1/comments/
 router.use("/comments", commentRoutes);
 
+// http://localhost:4000/api/v1/assignments/
 router.use("/assignments", assignmentRoutes);
 
+// http://localhost:4000/api/v1/submissions/
 router.use("/submissions", submissionRoutes);
 
 export default router;

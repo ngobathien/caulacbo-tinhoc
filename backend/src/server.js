@@ -34,7 +34,7 @@ connectDB();
 // http://localhost:4000/
 // Sử dụng router đã định nghĩa trong routes/index.js
 const api = process.env.API_URL;
-// console.log(api);
+// console.log(process.env.SUPABASE_KEY);
 app.use(`${api}`, router);
 
 // Start server
@@ -42,6 +42,8 @@ app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`);
 });
 
+// const supabaseKey = process.env.SUPABASE_KEY;
+// console.log(supabaseKey);
 // test ip lan nội bộ
 // app.listen(port, "0.0.0.0", () => {
 //   console.log(`Example app listening at http://192.168.1.50:${port}`);

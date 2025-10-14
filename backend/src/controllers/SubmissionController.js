@@ -1,42 +1,80 @@
 import Submission from "../models/Submission.js";
 import path from "path";
 import fs from "fs";
+import supabase from "../config/supabase.js";
+
+const bucket_name_assignments = "itclub-file";
 
 class SubmissionController {
   // Nộp bài (upload file) - Cho phép nộp lại
   async submitAssignment(req, res) {
     try {
+      // Nhận dữ liệu từ client
       const { assignmentId, nameClass, nameGroup, classId, groupId } = req.body;
+
       const studentId = req.user._id;
+
+      // Kiểm tra có file được gửi lên không
       if (!req.file) {
         return res.status(400).json({ message: "No file uploaded" });
       }
+      const file = req.file;
 
-      const fileUrl = `/uploads/assignments/${assignmentId}-${nameClass}-${nameGroup}/${req.file.filename}`;
+      const filePath = `uploads/assignments/${assignmentId}-${nameClass}-${nameGroup}/${req.file.originalname}`;
+      // const fileUrl = `/uploads/assignments/${assignmentId}-${nameClass}-${nameGroup}/${req.file.filename}`;
+      // console.log(filePath);
 
+      // Upload file lên supabase
+      const { data, error } = await supabase.storage
+        .from(bucket_name_assignments)
+        .upload(filePath, file.buffer, {
+          contentType: file.mimetype,
+          upsert: true,
+        });
+
+      if (error) throw error;
+
+      // Lấy link lưu vào database
+      const { data: publicUrlData } = await supabase.storage
+        .from(bucket_name_assignments)
+        .getPublicUrl(filePath);
+
+      // path lưu vào database
+      const fileUrl = publicUrlData.publicUrl;
+      const storagePath = filePath;
+      console.log(fileUrl);
+      //
       let submission = await Submission.findOne({ assignmentId, studentId });
+
+      // Nộp lại file
       if (submission) {
         submission.fileUrl = fileUrl;
+        submission.storagePath = storagePath;
         submission.submittedAt = new Date();
         submission.grade = null;
         submission.feedback = "";
         if (classId) submission.classId = classId;
         if (groupId) submission.groupId = groupId;
+
         await submission.save();
         return res.json({ message: "Đã nộp lại", submission });
       }
 
+      // Lưu vào database
       submission = new Submission({
         assignmentId,
         studentId,
         classId,
         groupId,
         fileUrl,
+        storagePath,
         submittedAt: new Date(),
       });
+
       await submission.save();
       res.status(201).json(submission);
     } catch (error) {
+      console.log(error);
       res
         .status(500)
         .json({ message: "Failed to submit", error: error.message });
@@ -93,30 +131,45 @@ class SubmissionController {
     }
   }
 
-  // Tải bài nộp về
+  // Tải bài nộp về từ Supabase
   async downloadSubmission(req, res) {
     try {
-      const { id } = req.params;
-      const submission = await Submission.findById(id);
-
-      if (!submission) {
-        return res.status(404).json({ message: "Submission not found" });
+      const { path } = req.query; // lấy path từ query
+      console.log(path);
+      if (!path) {
+        return res.status(400).json({ message: "Missing file path" });
       }
 
-      // Lấy đường dẫn vật lý thực tế từ fileUrl
-      const fileUrl = submission.fileUrl;
-      const relativePath = fileUrl.startsWith("/") ? fileUrl.slice(1) : fileUrl;
-      const filePath = path.join(process.cwd(), relativePath);
+      // Download file từ Supabase
+      const { data, error } = await supabase.storage
+        .from(bucket_name_assignments)
+        .download(path);
+      // it-club/uploads/assignments/68ee04d64018e9e774b86ce5-js-js 1/ngobathien.pdf
 
-      if (!fs.existsSync(filePath)) {
-        return res.status(404).json({ message: "File not found" });
+      if (error) {
+        console.error("Error downloading from Supabase:", error);
+        return res.status(500).json({ message: "Download file failed" });
       }
 
-      res.download(filePath);
+      // Lấy tên file từ path
+      const fileName = path.split("/").pop();
+
+      // Set header để tải file đúng định dạng
+      res.setHeader(
+        "Content-Disposition",
+        `attachment; filename="${fileName}"`
+      );
+
+      res.setHeader("Content-Type", data.type);
+
+      // Stream file về FE
+      return res.send(Buffer.from(await data.arrayBuffer()));
     } catch (error) {
-      res
-        .status(500)
-        .json({ message: "Download failed", error: error.message });
+      console.error(error);
+      res.status(500).json({
+        message: "Failed to download submission",
+        error: error.message,
+      });
     }
   }
 }

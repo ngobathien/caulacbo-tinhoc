@@ -20,6 +20,7 @@ export const submitAssignment = async (
   const res = await api.post("/submissions/submit", formData, {
     headers: { "Content-Type": "multipart/form-data" },
   });
+
   return res.data;
 };
 
@@ -45,8 +46,22 @@ export const gradeSubmission = async (submissionId, grade, feedback) => {
 };
 
 // Tải file
-export const downloadSubmission = (submissionId) => {
-  // Chỉ cần dùng baseURL từ env/apiClient
-  const baseURL = api.defaults.baseURL || "";
-  window.open(`${baseURL}/submissions/download/${submissionId}`);
+export const downloadSubmission = async (storagePath) => {
+  try {
+    const response = await api.get(`/submissions/download`, {
+      params: { path: storagePath },
+      responseType: "blob",
+    });
+
+    const fileName = storagePath.split("/").pop();
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", fileName);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+  } catch (error) {
+    console.error("Download failed:", error);
+  }
 };

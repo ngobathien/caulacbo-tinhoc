@@ -16,7 +16,8 @@ class PostController {
         .populate("classId")
         .populate("groupId")
         .sort({ createdAt: -1 });
-      res.status(200).json(posts);
+
+      res.status(200).json({ success: true, data: posts });
     } catch (error) {
       res.status(500).json({ message: "Lỗi khi lấy bài viết", error });
     }
