@@ -8,12 +8,16 @@ function Register() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  //   const [role, setRole] = useState("user");
+  // const [role, setRole] = useState("user");
   const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false); // ✅ Giữ nguyên state loading
   const navigate = useNavigate();
 
   const handleRegister = async (e) => {
     e.preventDefault();
+    setMessage("");
+    setLoading(true); // 1. Bắt đầu loading
+
     try {
       const userData = { username, email, password };
 
@@ -25,24 +29,26 @@ function Register() {
         setUsername("");
         setEmail("");
         setPassword("");
-        setMessage("");
 
         toast.success(
           "Đăng ký thành công! Vui lòng kiểm tra email để xác minh tài khoản."
         );
-        navigate("/login");
-        // Sau khi đăng ký thành công, chuyển hướng đến trang login
+
+        // Chỉ gọi navigate một lần sau khi toast hiển thị
         setTimeout(() => {
           navigate("/login");
-        }, 2000); // Đợi 2 giây để toast có thể hiển thị
+        }, 2000);
       }
     } catch (error) {
       console.error("Lỗi khi đăng ký:", error.message);
-      // setMessage(
-      //   toast.error(
-      //     error.response?.data?.message || "Đăng ký thất bại. Vui lòng thử lại."
-      //   )
-      // );
+
+      // ✅ Bật lại xử lý thông báo lỗi (Error Toast)
+      const errorMessage =
+        error.response?.data?.message || "Đăng ký thất bại. Vui lòng thử lại.";
+      toast.error(errorMessage);
+      setMessage(errorMessage); // Có thể dùng state 'message' nếu bạn muốn hiển thị lỗi trong form
+    } finally {
+      setLoading(false); // 2. Kết thúc loading (dù thành công hay thất bại)
     }
   };
 
@@ -58,6 +64,7 @@ function Register() {
           className="w-full px-4 py-2 border rounded mb-3"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
+          disabled={loading} // Vô hiệu hóa khi đang loading
         />
 
         {/* email */}
@@ -68,6 +75,7 @@ function Register() {
           className="w-full px-4 py-2 border rounded mb-3"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          disabled={loading} // Vô hiệu hóa khi đang loading
         />
 
         {/* password */}
@@ -78,13 +86,21 @@ function Register() {
           className="w-full px-4 py-2 border rounded mb-3"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          disabled={loading} // Vô hiệu hóa khi đang loading
         />
+
         <button
           id="registerBtn"
           type="submit"
-          className="w-full bg-green-500 text-white py-2 rounded"
+          className={`w-full text-white py-2 rounded ${
+            loading
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-green-500 hover:bg-green-600"
+          }`}
+          disabled={loading} // ✅ Vô hiệu hóa nút khi đang loading
         >
-          Đăng ký
+          {/* ✅ Thay đổi nội dung nút tùy theo trạng thái loading */}
+          {loading ? "Đang xử lý..." : "Đăng ký"}
         </button>
       </form>
       {message && <p className="text-center mt-3 text-red-500">{message}</p>}
