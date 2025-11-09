@@ -1,9 +1,9 @@
 import Submission from "../models/Submission.js";
-import path from "path";
-import fs from "fs";
 import supabase from "../config/supabase.js";
+import dotenv from "dotenv";
+dotenv.config(); // Load biến môi trường
 
-const bucket_name_assignments = "itclub-file";
+const bucket_name_assignments = process.env.BUCKET_NAME_ASSIGNMENTS;
 
 class SubmissionController {
   // Nộp bài (upload file) - Cho phép nộp lại
@@ -20,7 +20,7 @@ class SubmissionController {
       }
       const file = req.file;
 
-      const filePath = `uploads/assignments/${assignmentId}-${nameClass}-${nameGroup}/${req.file.originalname}`;
+      const filePath = `uploads/assignments/${assignmentId}/${studentId}-${req.file.originalname}`;
       // const fileUrl = `/uploads/assignments/${assignmentId}-${nameClass}-${nameGroup}/${req.file.filename}`;
       // console.log(filePath);
 

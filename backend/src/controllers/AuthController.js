@@ -20,7 +20,7 @@ class AuthController {
         return res.status(400).json({ message: "Thiếu thông tin!" });
       }
 
-      // kiểm tra 
+      // kiểm tra
       const existingUser = await User.findOne({ email });
       if (existingUser) {
         return res.status(400).json({ message: "Email đã tồn tại!" });
@@ -69,7 +69,15 @@ class AuthController {
         },
       });
     } catch (error) {
-      console.error("🔥 Lỗi đăng ký:", error);
+      console.error("Lỗi đăng ký:", error);
+
+      // status 429
+      if (error.status === 429) {
+        return res.status(429).json({
+          message: "Bạn gửi quá nhiều yêu cầu. Vui lòng thử lại sau vài phút.",
+        });
+      }
+
       return res.status(500).json({
         message: "Đăng ký không thành công, lỗi khi đăng ký!",
       });
@@ -86,23 +94,29 @@ class AuthController {
 
       const user = await User.findOne({ email });
       if (!user) {
-        return res.status(401).json({ message: "Email hoặc mật khẩu không đúng!" });
+        return res
+          .status(401)
+          .json({ message: "Email hoặc mật khẩu không đúng!" });
       }
 
       const isPasswordValid = await bcrypt.compare(password, user.password);
       if (!isPasswordValid) {
-        return res.status(401).json({ message: "Email hoặc mật khẩu không đúng!" });
+        return res
+          .status(401)
+          .json({ message: "Email hoặc mật khẩu không đúng!" });
       }
 
       if (!user.isVerified) {
         return res.status(403).json({
-          message: "Tài khoản chưa xác thực email. Vui lòng kiểm tra email để xác thực.",
+          message:
+            "Tài khoản chưa xác thực email. Vui lòng kiểm tra email để xác thực.",
         });
       }
 
       if (!user.isApproved) {
         return res.status(403).json({
-          message: "Tài khoản của bạn chưa được admin duyệt. Vui lòng chờ admin duyệt tài khoản.",
+          message:
+            "Tài khoản của bạn chưa được admin duyệt. Vui lòng chờ admin duyệt tài khoản.",
         });
       }
 
@@ -149,7 +163,7 @@ class AuthController {
 
       return res.status(200).send(`
         <html><body><h2 style="color:#2ecc71;">Xác thực thành công!</h2>
-        <p>Bạn có thể <a href="http://localhost:5173/login">đăng nhập ngay</a>.</p></body></html>
+        <p>Bạn có thể <a href="${process.env.URL_CLIENT}">đăng nhập ngay</a>.</p></body></html>
       `);
     } catch (error) {
       console.error("❌ verifyAccount error:", error);

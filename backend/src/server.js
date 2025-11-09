@@ -3,7 +3,7 @@ import cors from "cors";
 import path from "path";
 import router from "./routes/index.js";
 import connectDB from "./config/db.js";
-
+import { rateLimit } from "express-rate-limit";
 import dotenv from "dotenv";
 dotenv.config(); // Load biến môi trường
 
@@ -34,19 +34,44 @@ connectDB();
 // http://localhost:4000/
 // Sử dụng router đã định nghĩa trong routes/index.js
 const api = process.env.API_URL;
-// console.log(process.env.SUPABASE_KEY);
-app.use(`${api}`, router);
+
+// rate limit api
+const limiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  limit: 10, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
+  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+
+  // message: "Bạn gửi quá nhiều yêu cầu. Vui lòng thử lại sau vài phút.",
+  handler: (req, res) => {
+    res.status(429).json({
+      message: "Bạn gửi quá nhiều yêu cầu. Vui lòng thử lại sau vài phút.",
+    });
+  },
+});
+
+// app.use(limiter);
+
+app.use(`${api}`, limiter, router);
+
+app.set("trust proxy", 1);
+
+// test
+app.get("/", (req, res) => {
+  // req.ip đã lấy IP client thật nhờ trust proxy
+  let ip = req.ip;
+
+  // Chuẩn hóa IPv4-mapped IPv6 ::ffff:127.0.0.1 -> 127.0.0.1
+  if (ip.startsWith("::ffff:")) ip = ip.split("::ffff:")[1];
+  if (ip === "::1") ip = "127.0.0.1"; // localhost
+
+  console.log("IP của client:", ip);
+  res.send(`IP của bạn là: ${ip}`);
+});
 
 // Start server
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`);
 });
 
-// const supabaseKey = process.env.SUPABASE_KEY;
-// console.log(supabaseKey);
-// test ip lan nội bộ
-// app.listen(port, "0.0.0.0", () => {
-//   console.log(`Example app listening at http://192.168.1.50:${port}`);
-// });
-
-// console.log(process.env.MONGODB_URI);
+// console.log(process.env.URL_CLIENT);
