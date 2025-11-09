@@ -190,66 +190,68 @@ function ClassesPage() {
 
   return (
     <>
-      <main className="flex-grow container mx-auto px-20 py-6 mt-14">
-        <div className="flex flex-col md:flex-row justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-center md:text-left text-gray-800 dark:text-gray-200">
+      {/* Tối ưu hóa padding ngang:
+        px-4 (Mặc định/Mobile) -> sm:px-6 -> md:px-12 -> lg:px-20 (Padding gốc trên desktop)
+      */}
+      <main className="flex-grow container mx-auto px-4 sm:px-6 md:px-12 lg:px-20 py-6 mt-14">
+        {/* Header: Tiêu đề và Thanh tìm kiếm */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 space-y-4 md:space-y-0">
+          <h2 className="text-2xl font-bold text-center md:text-left text-gray-800 dark:text-gray-200 w-full md:w-auto">
             {isAdmin ? "Quản lý lớp học" : " Lớp của tôi"}
           </h2>
+          {/* Thanh tìm kiếm: Đảm bảo input chiếm đủ không gian trên mobile */}
           <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 w-full md:w-auto">
             <input
               id="classSearch"
               type="text"
               placeholder="Tìm kiếm lớp học"
-              className="w-full md:w-auto px-3 py-2 border rounded"
+              // Đặt w-full mặc định, chỉ thu nhỏ lại trên md
+              className="w-full md:w-64 lg:w-80 px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded shadow-sm focus:ring-blue-500 focus:border-blue-500 transition-colors"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
-            {/* <button
-              id="searchBtn"
-              className="bg-blue-500 text-white px-4 py-2 rounded w-full md:w-auto"
-              type="button"
-            >
-              <i className="fas fa-search"></i>
-            </button> */}
+            {/* Nút tìm kiếm bị comment out */}
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {/* nếu là giáo viên và admin sẽ hiển thị from tạo lớp học */}
+        {/* Danh sách lớp học (Grid) */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {/* Đã điều chỉnh tối đa thành xl:grid-cols-4 để phù hợp với màn hình lớn */}
+
+          {/* Form tạo lớp học (Admin) */}
           {isAdmin && <CreateClass onCreate={handleCreateClass} />}
 
-          {/* nếu là user sẽ hiển thị from tạo lớp học */}
+          {/* Lớp học của tôi (User/Teacher) - Đặt thành 1 cột trên Grid */}
           {isMemberOrTeacher && (
-            <div className="bg-white p-4 rounded-lg shadow-md mb-6">
-              <h3 className="text-lg font-semibold mb-4">Lớp học của tôi</h3>
-              <ul id="userClassesList" className="divide-y">
+            <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md border dark:border-gray-700">
+              <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">
+                Lớp học của tôi
+              </h3>
+              <ul
+                id="userClassesList"
+                className="divide-y divide-gray-200 dark:divide-gray-700"
+              >
                 {userClasses.length > 0 ? (
                   userClasses.map((classItem) => (
                     <li key={classItem._id} className="py-3">
                       <div className="flex justify-between items-center">
                         <div>
-                          <div className="font-medium">
+                          <div className="font-medium text-gray-800 dark:text-gray-200">
                             {classItem.nameClass}
                           </div>
-                          <div className="text-xs text-gray-500">
+                          <div className="text-xs text-gray-500 dark:text-gray-400">
                             <i className="fas fa-users mr-2"></i>
                             <span>
                               {classItem.members?.length || 0} thành viên
                             </span>
                           </div>
                         </div>
-                        {/* nút xem */}
-                        {/* <button
-                          onClick={() => handleViewClass(classItem._id)}
-                          className="text-blue-500 hover:underline"
-                        >
-                          <i className="fas fa-eye"></i>
-                        </button> */}
+                        {/* Nút xem bị comment out */}
                       </div>
                     </li>
                   ))
                 ) : (
-                  <li className="py-3 text-center text-gray-500">
+                  <li className="py-3 text-center text-gray-500 dark:text-gray-400">
                     <i className="fas fa-info-circle mr-2"></i> Bạn chưa tham
                     gia lớp nào.
                   </li>
@@ -258,6 +260,7 @@ function ClassesPage() {
             </div>
           )}
 
+          {/* Danh sách các ClassItem */}
           <ClassesList
             classes={filteredClasses}
             onDelete={handleDeleteClass}
@@ -267,6 +270,7 @@ function ClassesPage() {
             onUpdate={handleOpenEditModal}
           />
 
+          {/* Các Modals (Không cần thay đổi responsive) */}
           <UpdateClass
             isOpen={showEditModal}
             onClose={() => setShowEditModal(false)}

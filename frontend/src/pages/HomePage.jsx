@@ -607,10 +607,14 @@ function HomePage() {
 
   return (
     <>
-      <main className="flex-grow container mx-auto px-36 py-6 mt-14">
+      <main className="flex-grow container mx-auto px-4 sm:px-6 md:px-12 lg:px-24 xl:px-36 py-6 mt-14">
+        {/* Mobile: grid-cols-1 (Sidebar sẽ nằm dưới Cột chính do thứ tự DOM)
+          Tablet/Desktop (md:): grid-cols-3 (Cột chính 2/3, Sidebar 1/3)
+        */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Cột chính (Bài viết) - Chiếm 1 cột trên mobile, 2/3 từ md trở lên */}
           <div className="md:col-span-2 space-y-6">
-            <div className="w-full mb-6 ">
+            <div className="w-full mb-6">
               {editingPost ? (
                 <EditPost
                   editingPost={editingPost}
@@ -639,6 +643,8 @@ function HomePage() {
             </div>
             <ToastContainer position="top-right" autoClose={3000} />
           </div>
+
+          {/* Sidebar (renderCards) - Chiếm 1 cột trên mobile, 1/3 từ md trở lên */}
           <div className="space-y-6">{renderCards()}</div>
         </div>
       </main>

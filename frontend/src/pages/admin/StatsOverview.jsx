@@ -5,21 +5,42 @@ import {
   FaChalkboardTeacher,
   FaUsersCog,
 } from "react-icons/fa"; // Import icon
+import { getCount } from "../../services/countService";
 
 function StatsOverview() {
-  const [stats, setStats] = useState({
+  // const [stats, setStats] = useState({
+  //   totalUsers: 0,
+  //   totalPosts: 0,
+  //   totalGroups: 0,
+  //   totalClasses: 0,
+  // });
+
+  const [counts, setCounts] = useState({
     totalUsers: 0,
     totalPosts: 0,
     totalGroups: 0,
     totalClasses: 0,
   });
 
+  const fetchCounts = async () => {
+    try {
+      const countsData = await getCount();
+      setCounts(countsData);
+    } catch (error) {
+      console.error("Lỗi khi lấy danh sách người dùng:", error);
+    }
+  };
+
   useEffect(() => {
-    fetch("http://localhost:4000/counts/all")
-      .then((response) => response.json())
-      .then((data) => setStats(data))
-      .catch((error) => console.error("Error fetching stats:", error));
+    fetchCounts();
   }, []);
+
+  // useEffect(() => {
+  //   fetch("http://localhost:4000/api/v1/counts/all")
+  //     .then((response) => response.json())
+  //     .then((data) => setStats(data))
+  //     .catch((error) => console.error("Error fetching stats:", error));
+  // }, []);
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 text-center">
@@ -27,28 +48,28 @@ function StatsOverview() {
       {[
         {
           title: "Người dùng",
-          value: stats.totalUsers,
+          value: counts.totalUsers,
           icon: <FaUsers size={30} />,
           color: "bg-blue-500",
           glow: "shadow-blue-500/50",
         },
         {
           title: "Bài viết",
-          value: stats.totalPosts,
+          value: counts.totalPosts,
           icon: <FaFileAlt size={30} />,
           color: "bg-green-500",
           glow: "shadow-green-500/50",
         },
         {
           title: "Lớp học",
-          value: stats.totalClasses,
+          value: counts.totalClasses,
           icon: <FaChalkboardTeacher size={30} />,
           color: "bg-purple-500",
           glow: "shadow-purple-500/50",
         },
         {
           title: "Nhóm",
-          value: stats.totalGroups,
+          value: counts.totalGroups,
           icon: <FaUsersCog size={30} />,
           color: "bg-red-500",
           glow: "shadow-red-500/50",

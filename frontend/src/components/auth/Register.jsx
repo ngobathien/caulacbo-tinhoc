@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { register } from "../../services/authService";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { BeatLoader } from "react-spinners"; // 👈 Import BeatLoader
 
 function Register() {
   const [username, setUsername] = useState("");
@@ -10,7 +11,7 @@ function Register() {
   const [password, setPassword] = useState("");
   // const [role, setRole] = useState("user");
   const [message, setMessage] = useState("");
-  const [loading, setLoading] = useState(false); // ✅ Giữ nguyên state loading
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleRegister = async (e) => {
@@ -42,11 +43,11 @@ function Register() {
     } catch (error) {
       console.error("Lỗi khi đăng ký:", error.message);
 
-      // ✅ Bật lại xử lý thông báo lỗi (Error Toast)
       const errorMessage =
         error.response?.data?.message || "Đăng ký thất bại. Vui lòng thử lại.";
+
       toast.error(errorMessage);
-      setMessage(errorMessage); // Có thể dùng state 'message' nếu bạn muốn hiển thị lỗi trong form
+      setMessage(errorMessage);
     } finally {
       setLoading(false); // 2. Kết thúc loading (dù thành công hay thất bại)
     }
@@ -92,15 +93,22 @@ function Register() {
         <button
           id="registerBtn"
           type="submit"
-          className={`w-full text-white py-2 rounded ${
+          className={`w-full text-white py-2 rounded transition duration-150 ${
             loading
               ? "bg-gray-400 cursor-not-allowed"
               : "bg-green-500 hover:bg-green-600"
           }`}
-          disabled={loading} // ✅ Vô hiệu hóa nút khi đang loading
+          disabled={loading} // Vô hiệu hóa nút khi đang loading
         >
-          {/* ✅ Thay đổi nội dung nút tùy theo trạng thái loading */}
-          {loading ? "Đang xử lý..." : "Đăng ký"}
+          {loading ? (
+            // Hiển thị hiệu ứng loading xoay tròn
+            <div className="flex items-center justify-center">
+              <BeatLoader size={8} color={"#ffffff"} loading={loading} />
+            </div>
+          ) : (
+            // Nội dung nút bình thường
+            "Đăng ký"
+          )}
         </button>
       </form>
       {message && <p className="text-center mt-3 text-red-500">{message}</p>}

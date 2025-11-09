@@ -12,7 +12,7 @@ function DashboardPage() {
       <Sidebar />
 
       {/* Nội dung chính */}
-      <main className="flex-1 ml-64 p-6 bg-gray-100 overflow-auto mt-14">
+      <main className="flex-1 sm:ml-64 p-6 bg-gray-100 overflow-auto mt-14 transition-all duration-300">
         {/* Hiển thị số liệu thống kê chỉ khi ở trang Admin */}
         {location.pathname === "/dashboard" && <StatsOverview />}
 

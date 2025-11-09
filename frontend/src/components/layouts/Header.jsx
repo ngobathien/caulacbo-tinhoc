@@ -3,7 +3,8 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import UserAvatar from "../users/UserAvatar";
 
 function Header() {
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false); // Dùng để điều khiển menu mobile
+  const [userMenuOpen, setUserMenuOpen] = useState(false); // Dùng để điều khiển menu user dropdown
   const [user, setUser] = useState(null);
   const [darkMode, setDarkMode] = useState(() => {
     // Kiểm tra localStorage để giữ chế độ khi reload
@@ -26,13 +27,6 @@ function Header() {
     }
   }, [darkMode]);
 
-  // useEffect(() => {
-  //   const userData = localStorage.getItem("user");
-  //   if (userData) {
-  //     setUser(JSON.parse(userData));
-  //   }
-  // }, []);
-
   useEffect(() => {
     const updateUser = () => {
       const userData = localStorage.getItem("user");
@@ -54,51 +48,53 @@ function Header() {
     localStorage.removeItem("user");
     localStorage.removeItem("token");
     setUser(null);
+    setUserMenuOpen(false); // Đóng menu sau khi đăng xuất
     nav("/login");
   };
 
   // Nút chuyển chế độ tối/sáng
   const toggleDarkMode = () => setDarkMode((prev) => !prev);
+  // Toggle menu mobile
+  const toggleMenu = () => setMenuOpen((prev) => !prev);
 
   return (
     <header className="fixed top-0 left-0 w-full bg-white/90 backdrop-blur-md border-b border-gray-200 shadow-sm dark:bg-gray-900/90 dark:border-gray-700 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
         <div className="flex justify-between items-center">
-          {/* Logo + Navigation */}
-          <div className="flex items-center space-x-8">
-            <Link
-              to="/"
-              className="text-xl font-semibold text-blue-700 dark:text-blue-400 tracking-tight"
-            >
-              Câu Lạc Bộ
-            </Link>
+          {/* Logo */}
+          <Link
+            to="/"
+            className="text-xl font-semibold text-blue-700 dark:text-blue-400 tracking-tight"
+          >
+            Câu Lạc Bộ
+          </Link>
 
-            <nav className="hidden md:flex space-x-4">
-              {[
-                { to: "/", label: "Trang chủ" },
-                { to: "/classes", label: "Lớp học" },
-                { to: "/groups", label: "Nhóm" },
-                { to: "/exercises", label: "Bài tập" },
-                ...(isAdmin ? [{ to: "/dashboard", label: "Quản trị" }] : []), // 🔥 Chỉ thêm nếu isAdmin = true
-                { to: "/about", label: "Giới thiệu" },
-              ].map(({ to, label }) => (
-                <Link
-                  key={to}
-                  to={to}
-                  className={`px-3 py-1 rounded-md text-sm font-medium transition-all ${
-                    location.pathname === to
-                      ? "bg-blue-500 text-white dark:bg-blue-500"
-                      : "text-gray-700 hover:bg-gray-200 dark:text-gray-300 dark:hover:bg-gray-600"
-                  }`}
-                >
-                  {label}
-                </Link>
-              ))}
-            </nav>
-          </div>
+          {/* Navigation (Desktop) - Ẩn trên mobile, hiện từ md trở lên */}
+          <nav className="hidden md:flex items-center space-x-2 lg:space-x-4">
+            {[
+              { to: "/", label: "Trang chủ" },
+              { to: "/classes", label: "Lớp học" },
+              { to: "/groups", label: "Nhóm" },
+              { to: "/exercises", label: "Bài tập" },
+              ...(isAdmin ? [{ to: "/dashboard", label: "Quản trị" }] : []),
+              { to: "/about", label: "Giới thiệu" },
+            ].map(({ to, label }) => (
+              <Link
+                key={to}
+                to={to}
+                className={`px-3 py-2 rounded-md text-sm font-medium transition-all ${
+                  location.pathname === to
+                    ? "bg-blue-500 text-white dark:bg-blue-500"
+                    : "text-gray-700 hover:bg-gray-200 dark:text-gray-300 dark:hover:bg-gray-600"
+                }`}
+              >
+                {label}
+              </Link>
+            ))}
+          </nav>
 
-          {/* Dark Mode + User */}
-          <div className="flex items-center space-x-4">
+          {/* Dark Mode Toggle, User/Login, and Mobile Menu Button */}
+          <div className="flex items-center space-x-2 sm:space-x-3">
             {/* Dark Mode Toggle */}
             <button
               onClick={toggleDarkMode}
@@ -129,20 +125,21 @@ function Header() {
               )}
             </button>
 
-            {/* User Menu */}
+            {/* User Menu / Login Button */}
             {user ? (
               <div className="relative">
                 <button
-                  onClick={() => setMenuOpen(!menuOpen)}
+                  onClick={() => setUserMenuOpen(!userMenuOpen)}
                   className="flex items-center space-x-2 focus:outline-none"
                 >
-                  <span className="hidden md:inline text-gray-800 dark:text-gray-200">
+                  <span className="hidden sm:inline text-gray-800 dark:text-gray-200 text-sm">
+                    {" "}
                     Xin chào,{" "}
                     {user.role === "teacher"
                       ? `giáo viên ${user.username}`
                       : user.role === "admin"
                       ? `Quản trị viên ${user.username}`
-                      : `người dùng ${user.username || "Người dùng"}`}
+                      : `${user.username || "Người dùng"}`}
                   </span>
 
                   <UserAvatar
@@ -151,10 +148,11 @@ function Header() {
                   />
                 </button>
 
-                {menuOpen && (
+                {userMenuOpen && (
                   <div className="absolute right-0 mt-2 w-52 bg-white dark:bg-gray-800 rounded-lg shadow-lg ring-1 ring-black/5 dark:ring-white/10 z-20">
                     <Link
                       to={`/profile/${userId}`}
+                      onClick={() => setUserMenuOpen(false)}
                       className="block px-4 py-2 text-sm text-gray-800 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700"
                     >
                       Hồ sơ cá nhân
@@ -162,6 +160,7 @@ function Header() {
                     {user.role === "admin" && (
                       <Link
                         to="/dashboard"
+                        onClick={() => setUserMenuOpen(false)}
                         className="block px-4 py-2 text-sm text-gray-800 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700"
                       >
                         Quản trị
@@ -178,16 +177,89 @@ function Header() {
                 )}
               </div>
             ) : (
+              // Ẩn nút Đăng nhập trên màn hình mobile, chỉ hiện từ sm trở lên (đã có nút trong menu mobile)
               <Link
                 to="/login"
-                className="px-4 py-2 rounded-md bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transition-colors"
+                className="px-3 py-1.5 rounded-md bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transition-colors hidden sm:block"
               >
                 Đăng nhập
               </Link>
             )}
+
+            {/* Mobile Menu Button (Hamburger) - Chỉ hiện trên mobile, ẩn từ md trở lên */}
+            <button
+              onClick={toggleMenu}
+              className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 transition-colors md:hidden"
+              title="Menu"
+            >
+              {/* Biểu tượng Hamburger/Close (Dùng logic đơn giản) */}
+              <svg
+                className="w-5 h-5 text-gray-800 dark:text-gray-100"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                {menuOpen ? ( // Hiển thị X khi menu mở
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M6 18L18 6M6 6l12 12"
+                  ></path>
+                ) : (
+                  // Hiển thị Hamburger khi menu đóng
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M4 6h16M4 12h16m-7 6h7"
+                  ></path>
+                )}
+              </svg>
+            </button>
           </div>
         </div>
       </div>
+
+      {/* Mobile Navigation Menu */}
+      {menuOpen && (
+        <div className="md:hidden border-t dark:border-gray-700 pb-2">
+          <nav className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+            {[
+              { to: "/", label: "Trang chủ" },
+              { to: "/classes", label: "Lớp học" },
+              { to: "/groups", label: "Nhóm" },
+              { to: "/exercises", label: "Bài tập" },
+              ...(isAdmin ? [{ to: "/dashboard", label: "Quản trị" }] : []),
+              { to: "/about", label: "Giới thiệu" },
+            ].map(({ to, label }) => (
+              <Link
+                key={to}
+                to={to}
+                onClick={() => setMenuOpen(false)}
+                // Thêm 'block' để mỗi link chiếm một dòng
+                className={`block w-full text-left px-3 py-2 rounded-md text-base font-medium transition-all ${
+                  location.pathname === to
+                    ? "bg-blue-500 text-white dark:bg-blue-500"
+                    : "text-gray-700 hover:bg-gray-200 dark:text-gray-300 dark:hover:bg-gray-600"
+                }`}
+              >
+                {label}
+              </Link>
+            ))}
+            {!user && ( // Hiển thị nút Đăng nhập trong menu mobile nếu chưa đăng nhập
+              <Link
+                to="/login"
+                onClick={() => setMenuOpen(false)}
+                className="mt-2 block w-full text-center px-4 py-2 rounded-md bg-blue-600 text-white text-base font-semibold hover:bg-blue-700 transition-colors"
+              >
+                Đăng nhập
+              </Link>
+            )}
+          </nav>
+        </div>
+      )}
     </header>
   );
 }

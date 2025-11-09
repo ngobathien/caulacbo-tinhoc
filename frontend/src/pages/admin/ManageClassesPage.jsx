@@ -138,69 +138,83 @@ function ManageClassesPage() {
 
   return (
     <>
-      <main className="flex-grow container mx-auto px-36 py-6 mt-14">
-        <div className="bg-white shadow-lg rounded-lg p-6">
-          <div className="flex justify-between items-center mb-6">
-            <h1 className="text-xl font-bold text-gray-800 dark:text-white">
+      <main className="flex-grow container mx-auto px-4 sm:px-6 md:px-12 lg:px-24 xl:px-36 py-6 mt-14">
+        <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-4 sm:p-6">
+          {" "}
+          {/* Tối ưu padding card */}
+          {/* Header: Tiêu đề và Nút Thêm */}
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 space-y-3 sm:space-y-0">
+            <h1 className="text-xl font-bold text-gray-800 dark:text-gray-100">
               Quản lý lớp học
             </h1>
             <button
               onClick={handleOpenCreateModal}
-              className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors"
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors shadow-md w-full sm:w-auto" // w-full trên mobile để dễ thao tác
             >
               Thêm lớp học
             </button>
           </div>
-
           {paginatedData.length === 0 ? (
-            <p className="text-gray-500 text-center">Chưa có lớp học nào.</p>
+            <p className="text-gray-500 dark:text-gray-400 text-center py-8">
+              Chưa có lớp học nào.
+            </p>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse border border-gray-200">
+            <div className="overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-lg">
+              {" "}
+              {/* Đặt border cho container overflow */}
+              <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                {" "}
+                {/* Dùng min-w-full để đảm bảo co giãn */}
                 <thead>
-                  <tr className="bg-blue-600 text-white">
-                    <th className="border px-4 py-3 text-sm">STT</th>
-                    <th className="border px-4 py-3 text-sm text-center">ID</th>
-                    <th className="border px-4 py-3 text-sm text-center">
+                  <tr className="bg-blue-600 dark:bg-blue-800 text-white">
+                    <th className="px-4 py-3 text-sm font-semibold whitespace-nowrap">
+                      STT
+                    </th>
+                    {/* Ẩn ID trên mobile, hiện từ md trở lên */}
+                    <th className="hidden md:table-cell px-4 py-3 text-sm font-semibold text-center whitespace-nowrap">
+                      ID
+                    </th>
+                    <th className="px-4 py-3 text-sm font-semibold text-center whitespace-nowrap">
                       Tên lớp
                     </th>
-                    <th className="border px-4 py-3 text-sm text-center">
-                      Số lượng thành viên
+                    <th className="px-4 py-3 text-sm font-semibold text-center whitespace-nowrap">
+                      Thành viên
                     </th>
-                    <th className="border px-4 py-3 text-sm text-center">
+                    <th className="px-4 py-3 text-sm font-semibold text-center whitespace-nowrap">
                       Hành động
                     </th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody className="divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-800">
                   {paginatedData.map((classItem, index) => (
                     <tr
                       key={classItem._id}
-                      className="hover:bg-gray-50 dark:hover:bg-gray-800"
+                      className="hover:bg-gray-50 dark:hover:bg-gray-700"
                     >
-                      <td className="border px-4 py-3 text-sm text-center">
+                      <td className="px-4 py-3 text-sm text-center text-gray-700 dark:text-gray-300">
                         {(currentPage - 1) * PAGE_SIZE + index + 1}
                       </td>
-                      <td className="border px-4 py-3 text-sm text-center">
+                      {/* Ẩn ID trên mobile, hiện từ md trở lên */}
+                      <td className="hidden md:table-cell px-4 py-3 text-sm text-center text-gray-700 dark:text-gray-300 truncate max-w-xs">
                         {classItem._id}
                       </td>
-                      <td className="border px-4 py-3 text-sm text-center">
+                      <td className="px-4 py-3 text-sm font-medium text-center text-gray-800 dark:text-gray-100 whitespace-nowrap">
                         {classItem.nameClass || classItem.name}
                       </td>
-                      <td className="border px-4 py-3 text-sm text-center">
+                      <td className="px-4 py-3 text-sm text-center text-gray-700 dark:text-gray-300">
                         {classItem.members?.length || 0}
                       </td>
-                      <td className="border px-4 py-3 text-sm text-center">
+                      <td className="px-4 py-3 text-sm text-center">
                         <div className="flex justify-center gap-2">
                           <button
                             onClick={() => handleOpenEditModal(classItem)}
-                            className="bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600"
+                            className="bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600 transition-colors text-xs sm:text-sm"
                           >
                             Sửa
                           </button>
                           <button
                             onClick={() => handleDeleteClass(classItem._id)}
-                            className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600"
+                            className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 transition-colors text-xs sm:text-sm"
                           >
                             Xóa
                           </button>
@@ -220,6 +234,7 @@ function ManageClassesPage() {
         />
       </main>
 
+      {/* Modal - Đảm bảo responsive */}
       <ClassFormModal
         isOpen={showFormModal}
         onClose={() => setShowFormModal(false)}

@@ -234,121 +234,138 @@ function GroupPage() {
 
   return (
     <>
-      <main className="flex-grow container mx-auto px-36 py-6 mt-14">
-        <div className="flex justify-between items-center mb-6">
+      <main className="flex-grow container mx-auto px-4 sm:px-6 md:px-12 lg:px-24 xl:px-36 py-6 mt-14">
+        {/* Header: Tiêu đề, Lọc và Tìm kiếm */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 space-y-4 md:space-y-0">
           <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200">
             {isAdmin ? "Quản lý nhóm" : " Nhóm của tôi"}
           </h2>
-          <div className="flex space-x-2">
-            {/* Lọc lớp học nằm cạnh ô tìm kiếm */}
-            {(isAdmin || isMemberOrTeacher) && ( // Hiện thị select box nếu là admin HOẶC giáo viên/thành viên
+
+          {/* Lọc và Tìm kiếm - Chuyển sang flex-col trên mobile, md:flex-row trên tablet */}
+          <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 w-full md:w-auto">
+            {/* Lọc lớp học */}
+            {(isAdmin || isMemberOrTeacher) && (
               <select
                 id="filterClassId"
                 value={filterClassId}
                 onChange={(e) => setFilterClassId(e.target.value)}
-                className="px-3 py-2 border rounded"
-                style={{ minWidth: 160 }}
+                className="px-3 py-2 border rounded w-full md:w-auto dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100" // w-full trên mobile
+                style={{ minWidth: 160 }} // Giữ minWidth cho desktop/tablet
               >
                 <option value="">Tất cả lớp học</option>
-                {/* Lựa chọn lớp học sẽ dựa trên vai trò */}
                 {(isAdmin ? classes : userClasses).map((cls) => (
                   <option key={cls._id} value={cls._id}>
-                    {cls.nameClass || cls.name}{" "}
-                    {/* Dùng nameClass hoặc name tùy thuộc vào dữ liệu */}
+                    {cls.nameClass || cls.name}
                   </option>
                 ))}
               </select>
             )}
+            {/* Input Tìm kiếm */}
             <input
               id="groupSearch"
               type="text"
               placeholder="Tìm kiếm nhóm"
-              className="px-3 py-2 border rounded"
+              className="px-3 py-2 border rounded w-full md:w-64 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100" // w-full trên mobile
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
         </div>
 
+        {/* Bố cục Chính: 1 cột trên mobile/tablet, 4 cột từ lg trở lên (1/4 & 3/4) */}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          {isAdmin && (
-            <CreateGroup
-              onCreate={handleCreateGroup}
-              onFilter={handleFilterGroupByClass} // truyền hàm lọc lớp học xuống cho CreateGroup
-            />
-          )}
+          {/* Cột 1 (1/4): CreateGroup hoặc Sidebar thông tin */}
+          {(isAdmin || isMemberOrTeacher) && (
+            <div className="lg:col-span-1 space-y-6 order-1">
+              {isAdmin && (
+                <CreateGroup
+                  onCreate={handleCreateGroup}
+                  onFilter={handleFilterGroupByClass}
+                />
+              )}
 
-          {isMemberOrTeacher && (
-            <div className="lg:col-span-1">
-              {/* Lớp học của tôi */}
-              <div className="bg-white p-4 rounded-lg shadow-md mb-6">
-                <h3 className="text-lg font-semibold mb-4">Lớp học của tôi</h3>
-                <ul id="userClassesList" className="divide-y">
-                  {userClasses.length > 0 ? (
-                    userClasses.map((classItem) => (
-                      <li key={classItem._id} className="py-3">
-                        <div className="flex justify-between items-center">
-                          <div>
-                            <div className="font-medium">
-                              {classItem.nameClass}
+              {isMemberOrTeacher && (
+                <>
+                  {/* Lớp học của tôi */}
+                  <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md border dark:border-gray-700">
+                    <h3 className="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-200">
+                      Lớp học của tôi
+                    </h3>
+                    <ul
+                      id="userClassesList"
+                      className="divide-y divide-gray-200 dark:divide-gray-700"
+                    >
+                      {userClasses.length > 0 ? (
+                        userClasses.map((classItem) => (
+                          <li key={classItem._id} className="py-3">
+                            <div className="flex justify-between items-center">
+                              <div>
+                                <div className="font-medium text-gray-800 dark:text-gray-200">
+                                  {classItem.nameClass}
+                                </div>
+                                <div className="text-xs text-gray-500 dark:text-gray-400">
+                                  <i className="fas fa-users mr-2"></i>
+                                  <span>
+                                    {classItem.members?.length || 0} thành viên
+                                  </span>
+                                </div>
+                              </div>
                             </div>
-                            <div className="text-xs text-gray-500">
-                              <i className="fas fa-users mr-2"></i>
-                              <span>
-                                {classItem.members?.length || 0} thành viên
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      </li>
-                    ))
-                  ) : (
-                    <li className="py-3 text-center text-gray-500">
-                      <i className="fas fa-info-circle mr-2"></i> Bạn chưa tham
-                      gia lớp nào.
-                    </li>
-                  )}
-                </ul>
-              </div>
+                          </li>
+                        ))
+                      ) : (
+                        <li className="py-3 text-center text-gray-500 dark:text-gray-400">
+                          <i className="fas fa-info-circle mr-2"></i> Bạn chưa
+                          tham gia lớp nào.
+                        </li>
+                      )}
+                    </ul>
+                  </div>
 
-              {/* Nhóm của tôi */}
-              <div className="bg-white p-4 rounded-lg shadow-md">
-                <h3 className="text-lg font-semibold mb-4">
-                  Nhóm của tôi đã tham gia
-                </h3>
-                <ul id="userGroupsList" className="divide-y">
-                  {userGroup.length > 0 ? (
-                    userGroup.map((groupItem) => (
-                      <li key={groupItem._id} className="py-3">
-                        <div className="flex justify-between items-center">
-                          <div>
-                            <div className="font-medium">
-                              {groupItem.nameGroup}
+                  {/* Nhóm của tôi */}
+                  <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md border dark:border-gray-700">
+                    <h3 className="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-200">
+                      Nhóm của tôi đã tham gia
+                    </h3>
+                    <ul
+                      id="userGroupsList"
+                      className="divide-y divide-gray-200 dark:divide-gray-700"
+                    >
+                      {userGroup.length > 0 ? (
+                        userGroup.map((groupItem) => (
+                          <li key={groupItem._id} className="py-3">
+                            <div className="flex justify-between items-center">
+                              <div>
+                                <div className="font-medium text-gray-800 dark:text-gray-200">
+                                  {groupItem.nameGroup}
+                                </div>
+                                <div className="text-xs text-gray-500 dark:text-gray-400">
+                                  <i className="fas fa-users mr-2"></i>
+                                  <span>
+                                    {groupItem.members?.length || 0} thành viên
+                                  </span>
+                                </div>
+                              </div>
                             </div>
-                            <div className="text-xs text-gray-500">
-                              <i className="fas fa-users mr-2"></i>
-                              <span>
-                                {groupItem.members?.length || 0} thành viên
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      </li>
-                    ))
-                  ) : (
-                    <li className="py-3 text-center text-gray-500">
-                      <i className="fas fa-info-circle mr-2"></i> Bạn chưa tham
-                      gia nhóm nào.
-                    </li>
-                  )}
-                </ul>
-              </div>
+                          </li>
+                        ))
+                      ) : (
+                        <li className="py-3 text-center text-gray-500 dark:text-gray-400">
+                          <i className="fas fa-info-circle mr-2"></i> Bạn chưa
+                          tham gia nhóm nào.
+                        </li>
+                      )}
+                    </ul>
+                  </div>
+                </>
+              )}
             </div>
           )}
 
-          <div className="lg:col-span-3">
+          {/* Cột 2 (3/4): Danh sách nhóm */}
+          <div className="lg:col-span-3 order-2">
             <GroupsList
-              groups={filteredGroups} // Dùng danh sách đã lọc theo từ khóa và classId
+              groups={filteredGroups}
               onJoinGroup={handleJoinGroup}
               onLeaveGroup={handleLeaveGroup}
               onDeleteGroup={handleDeleteGroup}

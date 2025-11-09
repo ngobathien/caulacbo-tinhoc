@@ -91,7 +91,9 @@ function ManageUsersPage() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 mt-6">
+    // Điều chỉnh padding ngang từ mobile (px-4) lên desktop (px-8, px-12, etc.)
+    // Giữ nguyên py-8 và mt-6 để đảm bảo khoảng cách với Header (nếu có)
+    <div className="container mx-auto px-4 sm:px-6 md:px-8 lg:px-12 py-8 mt-6">
       <UsersList
         users={users}
         onDeleteUser={handleDeleteUser}
@@ -107,8 +109,12 @@ function ManageUsersPage() {
       />
 
       {showForm && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 p-4">
+          {" "}
+          {/* Thêm p-4 để modal không chạm mép màn hình mobile */}
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-2xl w-full max-w-sm sm:max-w-md">
+            {" "}
+            {/* Tăng shadow, tối ưu w-full max-w-sm trên mobile */}
             <CreateUsers
               onSubmit={editingUser ? handleEditUser : handleCreateUser}
               initialData={editingUser}
