@@ -71,10 +71,10 @@ app.get("/", (req, res) => {
 });
 
 // Start server
-app.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`);
-});
+// app.listen(port, () => {
+//   console.log(`Example app listening at http://localhost:${port}`);
+// });
 
 // console.log(process.env.URL_CLIENT);
 // cho deploy vercel
-// export default app;
+export default app;
