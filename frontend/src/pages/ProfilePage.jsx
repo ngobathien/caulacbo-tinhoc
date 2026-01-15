@@ -15,6 +15,7 @@ function ProfilePage() {
   const [avatarFile, setAvatarFile] = useState(null);
   const [avatarPreview, setAvatarPreview] = useState(null);
 
+  console.log(profile);
   const getToken = () => {
     return localStorage.getItem("token");
   };
@@ -47,7 +48,9 @@ function ProfilePage() {
       formData.append("phone", profile.phone || "");
       formData.append("address", profile.address || "");
       formData.append("hometown", profile.hometown || "");
+
       if (avatarFile) {
+        // avatar là tên sẽ dùng cho  uploadCsv.single("csv") multer ở backend
         formData.append("avatar", avatarFile);
       }
 
@@ -130,9 +133,16 @@ function ProfilePage() {
             className="cursor-pointer relative block"
           >
             <UserAvatar
-              user={{ ...profile, avatar: avatarPreview || profile.avatar }}
+              // user={{ ...profile, avatar: avatarPreview || profile.avatar }}
+              user={profile}
               size="h-36 w-36"
             />
+            {/* <img
+              src={profile.avatar || "/default-avatar.png"}
+              alt={profile.username}
+              className="h-36 w-36 rounded-full object-cover"
+            /> */}
+
             {isEditing && (
               <div className="absolute bottom-2 right-2 bg-white dark:bg-gray-700 rounded-full p-2 shadow-md">
                 <i className="fas fa-camera text-blue-600 text-xl"></i>

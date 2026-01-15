@@ -6,7 +6,8 @@ export default function UserAvatar({ user, size = "h-8 w-8", className = "" }) {
   if (user.avatar?.startsWith("blob:") || user.avatar?.startsWith("data:")) {
     src = user.avatar;
   } else if (user.avatar) {
-    src = `${BASE_URL}${user.avatar}`;
+    src = `${user.avatar}`;
+    console.log(src);
   }
   return (
     <span

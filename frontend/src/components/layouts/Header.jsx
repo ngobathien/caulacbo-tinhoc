@@ -143,9 +143,16 @@ function Header() {
                   </span>
 
                   <UserAvatar
+                    // src={user.avatar || "/default-avatar.png"}
                     user={user}
                     size="h-9 w-9 rounded-full ring-2 ring-blue-500 dark:ring-blue-300"
                   />
+                  {/* hoặc */}
+                  {/* <img
+                    src={user.avatar || "/default-avatar.png"}
+                    alt={user.username}
+                    className="h-15 w-10 rounded-full object-cover"
+                  /> */}
                 </button>
 
                 {userMenuOpen && (

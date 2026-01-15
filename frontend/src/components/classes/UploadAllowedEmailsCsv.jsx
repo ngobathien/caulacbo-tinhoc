@@ -32,6 +32,8 @@ function UploadAllowedEmailsCsv({ classId, initialUploaded, onSuccess }) {
     if (!file) return;
     setIsUploading(true);
     const formData = new FormData();
+
+    // csv là tên sẽ dùng cho  uploadCsv.single("csv") multer ở backend
     formData.append("csv", file);
     try {
       const token = localStorage.getItem("token");

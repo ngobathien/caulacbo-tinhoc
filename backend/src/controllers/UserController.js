@@ -1,5 +1,7 @@
+import supabase from "../config/supabase.js";
 import User from "../models/User.js";
 import bcrypt from "bcrypt";
+const bucket_name_avatars = process.env.BUCKET_NAME_ASSIGNMENTS;
 
 class UserController {
   // Lấy danh sách tất cả người dùng (chỉ admin)
@@ -120,16 +122,48 @@ class UserController {
       user.address = address !== undefined ? address : user.address;
       user.hometown = hometown !== undefined ? hometown : user.hometown;
 
-      // XỬ LÝ AVATAR
-      if (req.file) {
-        user.avatar = `/avatars/${req.user._id}/${req.file.filename}`;
-      }
-      if (req.file) {
-        const safeEmail = user.email.replace(/[^a-zA-Z0-9@.]/g, "_");
-        user.avatar = `/avatars/${user._id}-${user.email}/${req.file.filename}`;
+      // =========================supbase===============================
+      // Kiểm tra có file được gửi lên không
+      if (!req.file) {
+        return res.status(400).json({ message: "No file uploaded" });
       }
 
+      const file = req.file;
+      const filePath = `uploads/avatars/${req.user._id}/${req.file.originalname}`;
+      console.log(filePath);
+
+      // Upload avatar lên supabase
+      const { data, error } = await supabase.storage
+        .from(bucket_name_avatars)
+        .upload(filePath, file.buffer, {
+          contentType: file.mimetype,
+          upsert: true,
+        });
+
+      if (error) throw error;
+
+      // Lấy link lưu vào database
+      const { data: publicUrlData } = await supabase.storage
+        .from(bucket_name_avatars)
+        .getPublicUrl(filePath);
+
+      // path lưu vào database
+      const fileUrl = publicUrlData.publicUrl;
+      const storagePath = filePath;
+      console.log(fileUrl);
+
+      // ========================================================
+
+      // XỬ LÝ AVATAR
+      if (req.file) {
+        user.avatar = fileUrl;
+      }
+      // if (req.file) {
+      //   user.avatar = `/avatars/${user._id}-${user.email}/${req.file.filename}`;
+      // }
+
       const updatedUser = await user.save();
+
       res.json({
         message: "Cập nhật thành công.",
         user: {
