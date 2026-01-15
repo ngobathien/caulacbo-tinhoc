@@ -33,6 +33,7 @@ connectDB();
 
 // http://localhost:4000/
 // Sử dụng router đã định nghĩa trong routes/index.js
+
 const api = process.env.API_URL || "/api/v1";
 
 // rate limit api
@@ -51,8 +52,8 @@ const limiter = rateLimit({
 });
 
 // app.use(limiter);
-
-app.use(`${api}`, limiter, router);
+app.use(`${api}`, router);
+// app.use(`${api}`, limiter, router);
 
 app.set("trust proxy", 1);
 
@@ -70,11 +71,9 @@ app.get("/", (req, res) => {
 });
 
 // Start server
-// comment tạm thời để deploy vercel
-// app.listen(port, () => {
-//   console.log(`Example app listening at http://localhost:${port}`);
-// });
+app.listen(port, () => {
+  console.log(`Example app listening at http://localhost:${port}`);
+});
 
-// lệnh này dùng cho deploy vercel
-export default app;
 // console.log(process.env.URL_CLIENT);
+export default app;
