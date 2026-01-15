@@ -17,23 +17,23 @@ app.use(express.json());
 app.use(cors()); // Cho phép tất cả các nguồn gốc truy cập vào API
 
 // Middleware để phục vụ các tệp tĩnh từ thư mục uploads
-app.use(
-  "/avatars",
-  express.static(path.join(process.cwd(), "uploads", "avatars"))
-);
+// app.use(
+//   "/avatars",
+//   express.static(path.join(process.cwd(), "uploads", "avatars"))
+// );
 
-// Middleware để phục vụ các tệp tĩnh từ thư mục assignments
-app.use(
-  "/assignments",
-  express.static(path.join(process.cwd(), "uploads", "assignments"))
-); // serve file nộp bài
+// // Middleware để phục vụ các tệp tĩnh từ thư mục assignments
+// app.use(
+//   "/assignments",
+//   express.static(path.join(process.cwd(), "uploads", "assignments"))
+// ); // serve file nộp bài
 
 // kết nối đến cơ sở dữ liệu
 connectDB();
 
 // http://localhost:4000/
 // Sử dụng router đã định nghĩa trong routes/index.js
-const api = process.env.API_URL;
+const api = process.env.API_URL || "/api/v1";
 
 // rate limit api
 const limiter = rateLimit({
@@ -70,8 +70,11 @@ app.get("/", (req, res) => {
 });
 
 // Start server
-app.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`);
-});
+// comment tạm thời để deploy vercel
+// app.listen(port, () => {
+//   console.log(`Example app listening at http://localhost:${port}`);
+// });
 
+// lệnh này dùng cho deploy vercel
+export default app;
 // console.log(process.env.URL_CLIENT);
