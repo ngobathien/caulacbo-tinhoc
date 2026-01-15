@@ -17,23 +17,24 @@ app.use(express.json());
 app.use(cors()); // Cho phép tất cả các nguồn gốc truy cập vào API
 
 // Middleware để phục vụ các tệp tĩnh từ thư mục uploads
-app.use(
-  "/avatars",
-  express.static(path.join(process.cwd(), "uploads", "avatars"))
-);
+// app.use(
+//   "/avatars",
+//   express.static(path.join(process.cwd(), "uploads", "avatars"))
+// );
 
-// Middleware để phục vụ các tệp tĩnh từ thư mục assignments
-app.use(
-  "/assignments",
-  express.static(path.join(process.cwd(), "uploads", "assignments"))
-); // serve file nộp bài
+// // Middleware để phục vụ các tệp tĩnh từ thư mục assignments
+// app.use(
+//   "/assignments",
+//   express.static(path.join(process.cwd(), "uploads", "assignments"))
+// ); // serve file nộp bài
 
 // kết nối đến cơ sở dữ liệu
 connectDB();
 
 // http://localhost:4000/
 // Sử dụng router đã định nghĩa trong routes/index.js
-const api = process.env.API_URL;
+
+const api = process.env.API_URL || "/api/v1";
 
 // rate limit api
 const limiter = rateLimit({
@@ -51,8 +52,8 @@ const limiter = rateLimit({
 });
 
 // app.use(limiter);
-
-app.use(`${api}`, limiter, router);
+app.use(`${api}`, router);
+// app.use(`${api}`, limiter, router);
 
 app.set("trust proxy", 1);
 
@@ -75,3 +76,4 @@ app.listen(port, () => {
 });
 
 // console.log(process.env.URL_CLIENT);
+export default app;
